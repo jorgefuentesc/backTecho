@@ -3,6 +3,14 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
+
+class TipoUsuario(models.Model):
+    tiu_id = models.AutoField(primary_key=True)
+    tiu_nombre = models.TextField()
+    tiu_fecha_creacion = models.DateTimeField(auto_now_add=True)
+    tiu_fecha_actualizacion = models.DateTimeField(auto_now=True)
+    tiu_vigencia = models.BooleanField(default=True)
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
@@ -41,7 +49,7 @@ class CustomUser(AbstractUser):
     sexo = models.CharField(max_length=1, choices=SEXO_CHOICES, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'apellido_materno', 'rut']
-
+    tiu_id = models.ForeignKey(TipoUsuario,on_delete=models.PROTECT,null=True,blank=True,related_name="usuarios")
     objects = CustomUserManager()
 
     def __str__(self):
