@@ -122,7 +122,7 @@ def modificar_solicitud(request):
             if observaciones:
                 observacion_final = "Solicitud modificada. " + " | ".join(observaciones)
                 BitacoraSolicitud.objects.create(
-                    solicitud=solicitud,
+                    sca_id=solicitud,
                     usuario=request.user,
                     bsca_observacion=observacion_final
                 )
