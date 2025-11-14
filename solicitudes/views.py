@@ -783,3 +783,83 @@ def activar_usuario(request):
             {"error": "Ocurrió un error inesperado.", "detalle": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+        
+        
+        
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def modificar_usuario(request):
+        
+    try:
+        usuario_id = request.data.get('id')
+        rut_usuario = request.data.get('rut')
+        
+        usuario_a_modificar = None
+        error_msg = ""
+
+        if usuario_id:
+            usuario_a_modificar = get_object_or_404(CustomUser, id=usuario_id)
+            error_msg = f"No se encontró ningún usuario con el ID: {usuario_id}"
+        elif rut_usuario:
+            usuario_a_modificar = get_object_or_404(CustomUser, rut=rut_usuario)
+            error_msg = f"No se encontró ningún usuario con el RUT: {rut_usuario}"
+        else:
+            return Response(
+                {"error": "Debes proporcionar un 'id' o un 'rut' de usuario para modificar."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if 'email' in request.data:
+            email_nuevo = request.data.get('email')
+            if CustomUser.objects.filter(email=email_nuevo).exclude(id=usuario_a_modificar.id).exists():
+                return Response(
+                    {"error": f"El email '{email_nuevo}' ya está en uso por otro usuario."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            usuario_a_modificar.email = email_nuevo
+            
+        if 'first_name' in request.data:
+            usuario_a_modificar.first_name = request.data.get('first_name')
+        if 'last_name' in request.data:
+            usuario_a_modificar.last_name = request.data.get('last_name')
+        if 'apellido_materno' in request.data:
+            usuario_a_modificar.apellido_materno = request.data.get('apellido_materno')
+        if 'telefono' in request.data:
+            usuario_a_modificar.telefono = request.data.get('telefono')
+        if 'fecha_nacimiento' in request.data:
+            usuario_a_modificar.fecha_nacimiento = request.data.get('fecha_nacimiento')
+        if 'sexo' in request.data:
+            usuario_a_modificar.sexo = request.data.get('sexo')
+            
+        if 'tiu_id' in request.data:
+            try:
+                nuevo_tipo = TipoUsuario.objects.get(tiu_id=request.data.get('tiu_id'))
+                # Asumimos que tu campo se llama 'tipo_usuario' como corregimos
+                usuario_a_modificar.tipo_usuario = nuevo_tipo 
+            except TipoUsuario.DoesNotExist:
+                return Response(
+                    {"error": f"El tipo de usuario con id {request.data.get('tiu_id')} no existe."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+        usuario_a_modificar.save()
+
+        response_data = {
+            "mensaje": "Usuario modificado correctamente.",
+            "usuario": {
+                "id": usuario_a_modificar.id,
+                "email": usuario_a_modificar.email,
+                "rut": usuario_a_modificar.rut,
+                "nombre": usuario_a_modificar.first_name,
+                "telefono": usuario_a_modificar.telefono,
+                "tipo_usuario": usuario_a_modificar.tipo_usuario.tiu_nombre if usuario_a_modificar.tipo_usuario else None
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    except CustomUser.DoesNotExist:
+         return Response({"error": error_msg}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response(
+            {"error": "Ocurrió un error inesperado al modificar el usuario.", "detalle": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

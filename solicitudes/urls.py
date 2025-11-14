@@ -17,6 +17,7 @@ urlpatterns = [
     path('tipo/ver/', views.ver_tipos_usuario, name='ver-tipo-usuario'),
     path('tipo/usuario/', views.asignar_tipo_usuario, name='ver-tipo-usuario'),
     path('usuario/lista/', views.listar_usuarios, name='ver-tipo-usuario'),
+    path('usuario/modificar/', views.modificar_usuario, name='ver-tipo-usuario'),
     # path('documento/ver/', views.obtener_documento, name='obtener-documento'),
     path('usuario/desactivar_usuario/', views.desactivar_usuario, name='desactivar_usuario'),
     path('usuario/activar_usuario/', views.activar_usuario, name='activar_usuario'),
