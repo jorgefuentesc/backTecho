@@ -851,7 +851,7 @@ def modificar_usuario(request):
                 "rut": usuario_a_modificar.rut,
                 "nombre": usuario_a_modificar.first_name,
                 "telefono": usuario_a_modificar.telefono,
-                "tipo_usuario": usuario_a_modificar.tipo_usuario.tiu_nombre if usuario_a_modificar.tipo_usuario else None
+                "tipo_usuario": usuario_a_modificar.tiu_id.tiu_nombre if usuario_a_modificar.tiu_id else None
             }
         }
         return Response(response_data, status=status.HTTP_200_OK)
